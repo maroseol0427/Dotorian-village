@@ -1,4 +1,4 @@
-/* 도트마을 관리자 페이지 (구글 계정) */
+/* 도토리 마을 관리자 페이지 (구글 계정) */
 (() => {
   const MAX = 10;
   const ROOFS = ['#3fae8c','#e0574a','#8a73d6','#5b9be8','#e8b42a','#ff8fa6','#4fae63','#a8744a','#6a6aa6','#ef7fa8'];
@@ -94,7 +94,7 @@
       list.map(a => { let p = null; try{ p = JSON.parse(players[a.pid] || 'null'); }catch(e){}
         const on = !!live[a.pid];
         return '<div class="mem"><div class="slot" style="background:'+ROOFS[a.slot]+'">'+(a.slot+1)+'</div>'+
-          '<div class="who"><b>'+esc(a.name || '이름 없음')+'</b>'+(on ? '<span class="tag on">접속 중</span>' : '')+(p ? '' : '<span class="tag">첫 접속 전</span>')+
+          '<div class="who"><b>'+esc((p && p.name) || a.name || '이름 없음')+'</b>'+(p && p.name && p.name !== a.name ? '<span class="tag">등록 이름 '+esc(a.name)+'</span>' : '')+(on ? '<span class="tag on">접속 중</span>' : '')+(p ? '' : '<span class="tag">첫 접속 전</span>')+
           '<span>'+esc(a.email)+' · '+ago(p && p.at)+'</span></div>'+
           '<div class="acts"><button class="small" data-act="rename" data-k="'+esc(a.key)+'">이름</button><button class="small danger" data-act="del" data-k="'+esc(a.key)+'">삭제</button></div></div>'; }).join('')+'</div>';
   }

@@ -1,4 +1,4 @@
-# 우리집 도트마을 (Dotorian village)
+# 도토리 마을 (Dotorian-village)
 
 이웃들과 함께 사는 파스텔 동화풍 섬마을 게임. 폰 브라우저에서 바로 해요.
 

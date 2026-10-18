@@ -1,6 +1,6 @@
 {
-  "name": "우리집 도트마을",
-  "short_name": "도트마을",
+  "name": "도토리 마을",
+  "short_name": "도토리 마을",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",

@@ -7,12 +7,12 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="도트마을">
+<meta name="apple-mobile-web-app-title" content="도토리 마을">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <style>html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}</style>
-<title>우리집 도트마을</title>
+<title>도토리 마을</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
@@ -322,8 +322,8 @@ textarea{resize:none;height:76px}
 <div id="mini" hidden><div class="mbox" id="mbox"></div></div>
 
 <div id="pick">
-  <h1>우리집 도트마을</h1>
-  <p>이웃들과 함께 사는 작은 섬마을</p>
+  <h1>도토리 마을</h1>
+  <p>Dotorian village · 이웃들과 함께 사는 작은 섬마을</p>
   <div id="authBox" class="authbox"><p class="anote">불러오는 중…</p></div>
   <div id="cards" hidden></div>
   <div class="storeStatus" id="storeStatus"></div>
@@ -336,7 +336,7 @@ textarea{resize:none;height:76px}
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script>/* 우리집 도트마을 — web version: Google login (only accounts the admin registered) and the village server (Firebase). */
+<script>/* 도토리 마을 — web version: Google login (only accounts the admin registered) and the village server (Firebase). */
 window.DVNet = (() => {
   firebase.initializeApp(window.DV_FIREBASE || {});
   const auth = firebase.auth(), db = firebase.database();
@@ -4126,7 +4126,7 @@ function takePhoto(){
     g.font = Math.round(13*sx)+'px Jua, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
     document.querySelectorAll('#labels .lbl').forEach(l => { if (l.hidden || !l.textContent) return; const x = parseFloat(l.style.left)*sx + pad, y = parseFloat(l.style.top)*sx + pad - 10*sx; if (!(x>0 && y>0)) return; const tw = g.measureText(l.textContent).width + 16*sx; g.fillStyle = 'rgba(255,250,244,.92)'; g.beginPath(); g.roundRect ? g.roundRect(x-tw/2, y-10*sx, tw, 20*sx, 10*sx) : g.rect(x-tw/2, y-10*sx, tw, 20*sx); g.fill(); g.fillStyle = '#5b4b78'; g.fillText(l.textContent, x, y); });
     const d = new Date(); g.fillStyle = '#5b4b78'; g.font = Math.round(pad*1.1)+'px Jua, sans-serif'; g.textAlign = 'left';
-    g.fillText('우리집 도트마을 · '+G.me.name, pad, h + pad*2.1); g.textAlign = 'right'; g.fillStyle = '#8a7ca6';
+    g.fillText('도토리 마을 · '+G.me.name, pad, h + pad*2.1); g.textAlign = 'right'; g.fillStyle = '#8a7ca6';
     g.fillText(d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+' '+SEASONS[season()], cv.width - pad, h + pad*2.1);
     lastPhoto = cv; showPhoto(cv.toDataURL('image/png'));
   }; img.src = url;
@@ -5920,7 +5920,7 @@ function goFull(){ const d = document.documentElement, f = d.requestFullscreen |
 function toggleFull(){
   if (fsEl()){ (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
   if (standalone()){ toast('이미 전체 화면이에요'); return; }
-  if (!goFull() || isIOS) openPanel('전체 화면으로 하기', '<p class="note" style="font-size:15px;line-height:1.7">아이폰에서는 <b>홈 화면에 추가</b>해서 열면 주소창 없이 전체 화면으로 할 수 있어요.</p><ol style="font-family:var(--f-body);line-height:1.9;padding-left:20px"><li>Safari 아래쪽 <b>공유 버튼</b>(네모에 위 화살표)</li><li><b>홈 화면에 추가</b></li><li>홈 화면에 생긴 <b>도트마을</b> 아이콘으로 열기</li></ol><p class="note">안드로이드는 메뉴의 "전체 화면"을 누르거나, Chrome 메뉴 → 홈 화면에 추가 하면 돼요.</p>', { half:true });
+  if (!goFull() || isIOS) openPanel('전체 화면으로 하기', '<p class="note" style="font-size:15px;line-height:1.7">아이폰에서는 <b>홈 화면에 추가</b>해서 열면 주소창 없이 전체 화면으로 할 수 있어요.</p><ol style="font-family:var(--f-body);line-height:1.9;padding-left:20px"><li>Safari 아래쪽 <b>공유 버튼</b>(네모에 위 화살표)</li><li><b>홈 화면에 추가</b></li><li>홈 화면에 생긴 <b>도토리 마을</b> 아이콘으로 열기</li></ol><p class="note">안드로이드는 메뉴의 "전체 화면"을 누르거나, Chrome 메뉴 → 홈 화면에 추가 하면 돼요.</p>', { half:true });
 }
 // first touch in the game → full screen on phones that allow it (Android)
 let autoFullTried = false;
@@ -6023,6 +6023,34 @@ window.DV_CATALOG = () => ({
   furn: Object.entries(FURN).filter(([id,f]) => !f.fixture && f.price).map(([id,f]) => ({ id, name:f.name, price:f.price })),
   seeds: Object.entries(CROPS).map(([id,c]) => ({ id, name:c.name + ' 씨앗', price:c.seed })),
 });
+
+/* ---------- choose your own name (web version): asked once on the next visit, changeable in settings ---------- */
+function openNamePick(after){
+  G.panel = 'name';
+  openPanel('내 이름 정하기', '<p class="note" style="font-size:15px">마을에서 불릴 이름을 직접 정해 주세요. 나중에 설정에서도 바꿀 수 있어요.</p>'+
+    '<div class="chatin"><input id="namePick" maxlength="8" value="'+esc(G.me.name || '')+'" placeholder="이름 (8자까지)" autocomplete="off" enterkeyhint="done"><button class="go" id="nameOk">이 이름으로!</button></div><p class="note" id="nameMsg"></p>', { half:true, closeLabel:'나중에' });
+  const ok = () => { const v = $('#namePick').value.trim().replace(/\s+/g, ' '); if (!v){ $('#nameMsg').textContent = '이름을 적어 주세요'; return; }
+    G.me.name = v.slice(0, 8); G.me.nameSet = true; saveMe(true); updateHud && updateHud(); closePanel(); toast(G.me.name + '(으)로 정했어요!', 2000); if (after) setTimeout(after, 250); };
+  $('#nameOk').addEventListener('click', ok);
+  $('#namePick').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter' && !e.isComposing){ e.preventDefault(); ok(); } });
+  setTimeout(() => { try{ $('#namePick').focus(); $('#namePick').select(); }catch(e){} }, 200);
+}
+Store.on('loaded', () => {
+  if (!NETON()) return;
+  setTimeout(() => {
+    if (!G.started || !G.me || G.me.nameSet) return;
+    const needMirror = !G.me.made || G.panel === 'mirror';
+    if (G.panel) closePanel();
+    openNamePick(needMirror ? openMirror : null);
+  }, 700);
+});
+// settings: renaming there also counts as choosing a name
+const _openSettings9b = openSettings;
+openSettings = function(){
+  _openSettings9b();
+  const b = $('#saveName'); if (!b) return; const nb = b.cloneNode(true); b.replaceWith(nb);
+  nb.addEventListener('click', () => { const v = $('#myname').value.trim(); if (!v){ toast('이름을 적어 주세요'); return; } G.me.name = v.slice(0, 8); G.me.nameSet = true; saveMe(true); toast('이름을 '+G.me.name+'(으)로 바꿨어요'); });
+};
 
 
 $('#roomBtn').addEventListener('click', () => G.panel==='decor' ? closePanel() : openDecorate());
