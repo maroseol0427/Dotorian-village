@@ -6052,6 +6052,39 @@ openSettings = function(){
   nb.addEventListener('click', () => { const v = $('#myname').value.trim(); if (!v){ toast('이름을 적어 주세요'); return; } G.me.name = v.slice(0, 8); G.me.nameSet = true; saveMe(true); toast('이름을 '+G.me.name+'(으)로 바꿨어요'); });
 };
 
+/* ---------- name signs in front of every player's house ---------- */
+const houseSignCache = {};
+function houseSignName(slot){
+  const p = Store.data.players[pid(slot)];
+  if (slot === G.slot && G.me) return G.me.name;
+  if (p && p.name) return p.name;
+  return NETON() ? '' : SLOTS[slot].name; // web: nobody lives here yet
+}
+function refreshHouseSigns(force){
+  BUILD.forEach(b => {
+    if (b.kind !== 'house') return; const g = objMeshes.get(b.id); if (!g) return;
+    const name = houseSignName(b.slot), label = name ? name + '네 집' : '빈 집', key = label + '|' + ROOFS[b.slot];
+    if (!force && g.userData.signKey === key && g.userData.sign && g.userData.sign.parent === g) return;
+    if (g.userData.sign){ g.remove(g.userData.sign); g.userData.sign.traverse(o => { if (o.material && o.material.map) o.material.map.dispose(); }); }
+    const s = new THREE.Group();
+    M(GC('hsPost', () => new THREE.CylinderGeometry(0.05, 0.06, 0.95, 8)), '#b9875c', 0, 0.47, 0, s);
+    M(GC('hsBoard', () => new THREE.BoxGeometry(1.42, 0.42, 0.07)), '#fff6e8', 0, 1.02, 0, s);
+    M(GC('hsTrim', () => new THREE.BoxGeometry(1.5, 0.08, 0.09)), ROOFS[b.slot], 0, 1.26, 0, s);
+    const fg = name ? '#5b4b78' : '#a89cbf';
+    [1, -1].forEach(side => { const pl = signMesh(label, 1.3, 0.33, '#fff6e8', fg); pl.position.set(0, 1.02, 0.04*side); if (side < 0) pl.rotation.y = Math.PI; s.add(pl); });
+    s.position.set(1.15, 0, 1.75); s.rotation.y = -0.15;
+    s.traverse(o => { o.userData.key = b.id; });
+    g.add(s); g.userData.sign = s; g.userData.signKey = key;
+  });
+}
+const _buildWorld9 = buildWorld;
+buildWorld = function(){ _buildWorld9.apply(this, arguments); refreshHouseSigns(true); };
+Store.on('players', () => refreshHouseSigns());
+Store.on('loaded', () => setTimeout(() => refreshHouseSigns(), 300));
+const _saveMe9 = saveMe;
+saveMe = function(now){ _saveMe9(now); if (G.me && houseSignCache.last !== G.me.name){ houseSignCache.last = G.me.name; refreshHouseSigns(); } };
+refreshHouseSigns(true);
+
 
 $('#roomBtn').addEventListener('click', () => G.panel==='decor' ? closePanel() : openDecorate());
 $('#talk').addEventListener('click', e => { if (e.target.closest('[data-o],[data-g]')) return; dialogTap(); });
