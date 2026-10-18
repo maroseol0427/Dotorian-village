@@ -35,6 +35,7 @@
   function render(){
     const byV = {}; Object.entries(allowed).forEach(([k, a]) => { (byV[a.village] = byV[a.village] || []).push(Object.assign({ key:k, email:emailOf(k) }, a)); });
     const vnames = Object.keys(byV).sort();
+    keepG = { to:($('#gTo')||{}).value, kind:($('#gKind')||{}).value, item:($('#gItem')||{}).value, n:($('#gN')||{}).value, msg:($('#gMsg')||{}).value };
     const keep = { em:($('#nem')||{}).value || '', nm:($('#nnm')||{}).value || '', v:($('#nv')||{}).value || '', nv:($('#nvn')||{}).value || '' };
     app.innerHTML =
       '<div class="card"><h2>구글 계정 등록</h2>'+
@@ -43,13 +44,48 @@
       '<div id="nvWrap"><label>새 마을 이름 (영문·숫자·한글)</label><input id="nvn" maxlength="20" placeholder="예: family"></div></div>'+
       '<button class="go" id="add">등록하기</button><p id="msg" class="msg"></p>'+
       '<p class="sub" style="margin:8px 0 0;font-size:13px">등록한 사람은 게임 첫 화면에서 "Google 계정으로 시작하기"를 누르고 이 계정을 고르면 바로 들어와요.</p></div>'+
+      (vnames.length ? giftCard(byV, vnames) : '')+
       (vnames.length ? vnames.map(v => villageCard(v, byV[v])).join('') : '<div class="card empty">아직 등록한 계정이 없어요.</div>')+
       '<div class="card"><span class="sub" style="font-size:13px">관리자: '+esc((auth.currentUser||{}).email||'')+'</span><br><button class="small" id="out" style="margin-top:8px">관리자 로그아웃</button></div>';
     $('#nem').value = keep.em; $('#nnm').value = keep.nm; if (pickV){ $('#nv').value = pickV; pickV = ''; $('#nvn').value = ''; } else if (keep.v) $('#nv').value = keep.v; $('#nvn').value = keep.nv;
     const syncNew = () => { $('#nvWrap').style.display = $('#nv').value === '__new' ? '' : 'none'; }; $('#nv').onchange = syncNew; syncNew();
     msg(lastMsg[0], lastMsg[1]);
-    $('#add').onclick = add; $('#out').onclick = () => auth.signOut();
+    $('#add').onclick = add;
+    if ($('#gKind')){ const gk = keepG; if (gk.to) $('#gTo').value = gk.to; if (gk.kind) $('#gKind').value = gk.kind; fillGiftItems(); if (gk.item) $('#gItem').value = gk.item; if (gk.n) $('#gN').value = gk.n; if (gk.msg) $('#gMsg').value = gk.msg;
+      $('#gKind').onchange = fillGiftItems; $('#gSend').onclick = sendGift; gmsg(lastG[0], lastG[1]); } $('#out').onclick = () => auth.signOut();
     app.querySelectorAll('[data-act]').forEach(b => b.onclick = () => act(b.dataset.act, b.dataset.k));
+  }
+  let keepG = {}, lastG = ['', false];
+  const gmsg = (t, bad) => { lastG = [t || '', !!bad]; const m = $('#gMsgOut'); if (m){ m.textContent = t || ''; m.classList.toggle('bad', !!bad); } };
+  const CAT = window.DV_CATALOG || { items:[], furn:[], seeds:[] };
+  function giftCard(byV, vnames){
+    const opts = vnames.map(v => '<optgroup label="'+esc(v)+' 마을"><option value="all|'+esc(v)+'">'+esc(v)+' 마을 모두에게</option>'+byV[v].sort((a,b)=>a.slot-b.slot).map(a => '<option value="'+esc(a.key)+'">'+esc(a.name)+' ('+(a.slot+1)+'번 집)</option>').join('')+'</optgroup>').join('');
+    return '<div class="card"><h2>선물 보내기</h2>'+
+      '<div class="row"><div><label>받는 사람</label><select id="gTo">'+opts+'</select></div><div><label>선물 종류</label><select id="gKind"><option value="acorn">도토리</option><option value="item">옷·소품·악기·탈것</option><option value="furn">가구</option><option value="seed">씨앗</option></select></div></div>'+
+      '<div class="row"><div id="gItemWrap"><label>아이템</label><select id="gItem"></select></div><div><label id="gNLabel">개수</label><input id="gN" type="number" inputmode="numeric" min="1" max="99999" value="100"></div></div>'+
+      '<label>한마디 (선택)</label><input id="gMsg" maxlength="40" placeholder="예: 생일 축하해!">'+
+      '<button class="go" id="gSend">선물 보내기</button><p id="gMsgOut" class="msg"></p>'+
+      '<p class="sub" style="margin:8px 0 0;font-size:13px">받는 사람이 게임에 들어오면 바로 도착해요(지금 접속 중이면 즉시).</p></div>';
+  }
+  function fillGiftItems(){
+    const k = $('#gKind').value, sel = $('#gItem');
+    $('#gItemWrap').style.display = k === 'acorn' ? 'none' : ''; $('#gNLabel').textContent = k === 'acorn' ? '도토리 개수' : '개수';
+    if (k === 'item'){ $('#gN').value = 1; $('#gN').disabled = true; } else { $('#gN').disabled = false; if (k !== 'acorn' && Number($('#gN').value) > 99) $('#gN').value = 1; }
+    const list = k === 'item' ? CAT.items : k === 'furn' ? CAT.furn : k === 'seed' ? CAT.seeds : [];
+    if (k === 'item'){ const g = {}; list.forEach(it => (g[it.cat] = g[it.cat] || []).push(it)); sel.innerHTML = Object.entries(g).map(([c, arr]) => '<optgroup label="'+esc(c)+'">'+arr.map(it => '<option value="'+esc(it.id)+'">'+esc(it.name)+'</option>').join('')+'</optgroup>').join(''); }
+    else sel.innerHTML = list.map(it => '<option value="'+esc(it.id)+'">'+esc(it.name)+'</option>').join('');
+  }
+  async function sendGift(){
+    const to = $('#gTo').value, kind = $('#gKind').value, id = kind === 'acorn' ? '' : $('#gItem').value, n = Math.round(Number($('#gN').value) || 0), msg = $('#gMsg').value.trim().slice(0, 40);
+    if (kind !== 'item' && (n < 1 || n > 99999)) return gmsg('개수를 확인해 주세요 (1~99999)', true);
+    if (kind !== 'acorn' && !id) return gmsg('아이템을 골라 주세요', true);
+    const targets = to.startsWith('all|') ? Object.values(allowed).filter(a => a.village === to.slice(4)) : [allowed[to]].filter(Boolean);
+    if (!targets.length) return gmsg('받는 사람을 골라 주세요', true);
+    const body = JSON.stringify({ kind, id, n: kind === 'item' ? 1 : n, msg, at:Date.now() });
+    try{ await Promise.all(targets.map(a => db.ref('villages/'+a.village+'/gifts/'+a.pid).push(body))); $('#gMsg').value = '';
+      const what = kind === 'acorn' ? '도토리 '+n+'개' : ($('#gItem').selectedOptions[0] || {}).textContent + (kind === 'item' ? '' : ' '+n+'개');
+      gmsg((targets.length > 1 ? targets.length+'명에게 ' : targets[0].name+'에게 ')+what+' 선물을 보냈어요!'); }
+    catch(e){ gmsg(errText(e), true); }
   }
   function villageCard(v, list){
     list.sort((a,b) => a.slot - b.slot);

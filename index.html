@@ -1,7 +1,22 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#cfeef8">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="도트마을">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}</style>
 <title>우리집 도트마을</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+</head><body>
 <style>
 /* Layout: full-screen storybook village. Portrait: status on top, d-pad bottom-left and action bottom-right above the menu bar, sheets rise from the bottom.
    Landscape: d-pad and action in the bottom corners, menu bar between them, sheets slide in from the right. One committed pastel look. */
@@ -229,6 +244,33 @@ textarea{resize:none;height:76px}
 .hearts{color:#ff7f9a;letter-spacing:1px;font-family:var(--f-ui)}
 @media (orientation: landscape) and (max-height: 560px){ #mm{width:84px;height:84px} }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* v9b: menu button on the left instead of the bottom bar */
+.bar[hidden]{display:none!important}
+#menuBtn{position:relative;background:var(--lav);color:#fff}
+#menuBtn .dot{position:absolute;top:2px;right:2px;width:10px;height:10px;border-radius:50%;background:var(--warn);border:2px solid #fff}
+#menuPop{position:fixed;z-index:30;left:calc(max(12px,env(safe-area-inset-left,0px)) + 48px);top:calc(env(safe-area-inset-top,0px) + 74px);display:flex;flex-direction:column;gap:6px;padding:8px;border-radius:20px;background:rgba(255,250,244,.96);box-shadow:var(--shadow);max-height:calc(100% - 100px);overflow-y:auto}
+#menuPop[hidden]{display:none}
+#menuPop button{display:flex;align-items:center;gap:10px;justify-content:flex-start;font-size:16px;padding:9px 16px 9px 12px;border-radius:14px;white-space:nowrap;position:relative}
+#menuPop .ico{width:22px;height:22px}
+#menuPop .badge{position:static;margin-left:auto}
+#dpad{bottom:calc(env(safe-area-inset-bottom,0px) + 24px)}
+#actBtn{bottom:calc(env(safe-area-inset-bottom,0px) + 34px)}
+#jumpBtn{bottom:calc(env(safe-area-inset-bottom,0px) + 34px)}
+#rideBtn{bottom:calc(env(safe-area-inset-bottom,0px) + 142px)}
+@media (orientation: landscape) and (max-height: 560px){
+  #menuPop{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 198px);left:max(12px,env(safe-area-inset-left,0px));max-height:calc(100% - 210px);flex-wrap:wrap;flex-direction:row;max-width:min(560px,70vw)}
+  #dpad{bottom:calc(env(safe-area-inset-bottom,0px) + 14px)} #actBtn{bottom:calc(env(safe-area-inset-bottom,0px) + 18px)} #jumpBtn{bottom:calc(env(safe-area-inset-bottom,0px) + 22px)} #rideBtn{bottom:calc(env(safe-area-inset-bottom,0px) + 116px)}
+}
+.chatlist{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow-y:auto;padding:4px 2px 8px}
+.chatmsg{max-width:85%;padding:8px 12px;border-radius:16px 16px 16px 4px;background:#fff;box-shadow:0 1px 3px rgba(90,70,120,.12);font-family:var(--f-body);font-size:15px;line-height:1.4;align-self:flex-start;word-break:break-word}
+.chatmsg b{display:block;font-family:var(--f-ui);font-weight:normal;font-size:12px;color:var(--ink-soft)}
+.chatmsg.me{align-self:flex-end;background:#e4f6ec;border-radius:16px 16px 4px 16px}
+.chatmsg.sys{align-self:center;background:#fff4d6;font-size:13px}
+.chatin{display:flex;gap:8px;margin-top:6px}
+.chatin input{flex:1;min-width:0;font:inherit;font-family:var(--f-body);font-size:16px;padding:11px 14px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--ink)}
+.chatin button{flex:0 0 auto}
+#labels .say.chat{background:#fff;border:2px solid #b9e6cf}
 </style>
 
 <canvas id="gl"></canvas>
@@ -245,13 +287,22 @@ textarea{resize:none;height:76px}
       <div class="status" id="status"></div>
     </div>
   </div>
-  <div class="zoom"><button id="zin" aria-label="가까이">+</button><button id="zout" aria-label="멀리">−</button><button id="camReset" aria-label="카메라 정면으로" class="cr"><span class="ico" data-ico="compass"></span></button><button id="photoBtn" aria-label="사진 찍기"><span class="ico" data-ico="camera"></span></button></div>
+  <div id="menuPop" hidden>
+    <button data-m="bBag"><span class="ico" data-ico="bag"></span>가방</button>
+    <button data-m="bMap"><span class="ico" data-ico="map"></span>지도</button>
+    <button data-m="bWard"><span class="ico" data-ico="shirt"></span>옷장</button>
+    <button data-m="bMail"><span class="ico" data-ico="mail"></span>편지<span class="badge" id="mailBadge2" hidden>0</span></button>
+    <button data-m="chat" class="netonly" hidden><span class="ico" data-ico="chat"></span>채팅<span class="badge" id="chatBadge2" hidden>0</span></button>
+    <button data-m="full"><span class="ico" data-ico="expand"></span>전체 화면</button>
+    <button data-m="bSet"><span class="ico" data-ico="gear"></span>설정</button>
+  </div>
+  <div class="zoom"><button id="menuBtn" aria-label="메뉴"><span class="ico" data-ico="menu"></span><i class="dot" id="menuDot" hidden></i></button><button id="zin" aria-label="가까이">+</button><button id="zout" aria-label="멀리">−</button><button id="camReset" aria-label="카메라 정면으로" class="cr"><span class="ico" data-ico="compass"></span></button><button id="photoBtn" aria-label="사진 찍기"><span class="ico" data-ico="camera"></span></button></div>
   <div id="dpad" aria-label="방향키"><span class="ar u"></span><span class="ar d"></span><span class="ar l"></span><span class="ar r"></span><div id="knob"></div></div>
   <button id="actBtn">행동</button>
   <button id="jumpBtn" aria-label="점프">점프</button>
   <button id="rideBtn" class="sun" hidden>타기</button>
   <button id="roomBtn" hidden>방 꾸미기</button>
-  <div class="bar">
+  <div class="bar" hidden>
     <button id="bBag"><span class="ico" data-ico="bag"></span>가방</button>
     <button id="bMap"><span class="ico" data-ico="map"></span>지도</button>
     <button id="bWard"><span class="ico" data-ico="shirt"></span>옷장</button>
@@ -354,6 +405,8 @@ window.DVNet = (() => {
   /* ---------- village data ---------- */
   api.on = (path, fn) => { db.ref(api.base + path).on('value', s => fn(s.val()), e => console.warn('read', path, e)); };
   api.set = (path, val) => db.ref(api.base + path).set(val).catch(e => console.warn('write', path, e));
+  api.onLast = (path, n, fn) => { db.ref(api.base + path).orderByKey().limitToLast(n).on('value', s => fn(s.val()), e => console.warn('read', path, e)); };
+  api.remove = path => db.ref(api.base + path).remove().catch(e => console.warn('remove', path, e));
   api.push = (path, val) => db.ref(api.base + path).push(val).catch(e => console.warn('push', path, e));
   api.signOut = async () => { try{ await db.ref(api.base + 'live/' + api.session.pid).remove(); }catch(e){} await auth.signOut(); location.reload(); };
   api.who = () => api.session ? api.session.email : '';
@@ -2243,6 +2296,10 @@ const ICONS = {
   map:'<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>',
   compass:'<circle cx="12" cy="12" r="9"/><path d="M12 5l3 7-3 7-3-7z"/>',
   camera:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
+  chat:'<path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/>',
+  expand:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+  gift:'<rect x="3" y="9" width="18" height="12" rx="2"/><path d="M3 13h18M12 9v12M12 9C9 9 7 7.5 8 5.5S12 6 12 9c0-3 3-5.5 4-3.5S15 9 12 9z"/>',
   gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>',
 };
 document.querySelectorAll('[data-ico]').forEach(el => { el.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+ICONS[el.dataset.ico]+'</svg>'; });
@@ -5830,6 +5887,143 @@ window.addEventListener('beforeunload', () => { if (NETON()){ try{ saveMe(true);
 // app in the background → leave the street (come back when the app is opened again)
 document.addEventListener('visibilitychange', () => { if (!NETON()) return; if (document.hidden){ try{ saveMe(true); }catch(e){} window.DVNet.clearLive(); } else liveSendT = 0; });
 
+/* ================= v9b: left menu button, full screen, gifts from the admin, village chat ================= */
+
+let chatMsgs = [], chatUnread = 0, chatFirst = true, chatSeenAt = Number(LS.get('dv.chatSeen', 0)) || 0;
+/* ---------- menu ---------- */
+const menuPop = $('#menuPop');
+function toggleMenu(show){ const on = show === undefined ? menuPop.hidden : show; menuPop.hidden = !on; }
+$('#menuBtn').addEventListener('click', e => { e.stopPropagation(); toggleMenu(); });
+menuPop.addEventListener('click', e => {
+  const b = e.target.closest('[data-m]'); if (!b) return; toggleMenu(false);
+  const m = b.dataset.m;
+  if (m === 'full') return toggleFull();
+  if (m === 'chat') return G.panel === 'chat' ? closePanel() : openChat();
+  const t = document.getElementById(m); if (t) t.click();
+});
+document.addEventListener('pointerdown', e => { if (!menuPop.hidden && !e.target.closest('#menuPop') && !e.target.closest('#menuBtn')) toggleMenu(false); }, true);
+if (window.DVNet) menuPop.querySelectorAll('.netonly').forEach(b => b.hidden = false);
+function syncMenuDot(){
+  const mail = Number($('#mailBadge').hidden ? 0 : $('#mailBadge').textContent) || 0;
+  $('#mailBadge2').hidden = !mail; $('#mailBadge2').textContent = mail;
+  $('#chatBadge2').hidden = !chatUnread; $('#chatBadge2').textContent = chatUnread > 99 ? '99+' : chatUnread;
+  $('#menuDot').hidden = !(mail || chatUnread);
+}
+const _updateBadge9 = updateBadge;
+updateBadge = function(){ _updateBadge9(); syncMenuDot(); };
+
+/* ---------- full screen ---------- */
+const isIOS = /iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const standalone = () => window.matchMedia('(display-mode: fullscreen)').matches || window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+function goFull(){ const d = document.documentElement, f = d.requestFullscreen || d.webkitRequestFullscreen; if (!f) return false; try{ const r = f.call(d, { navigationUI:'hide' }); if (r && r.catch) r.catch(() => {}); return true; }catch(e){ return false; } }
+function toggleFull(){
+  if (fsEl()){ (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
+  if (standalone()){ toast('이미 전체 화면이에요'); return; }
+  if (!goFull() || isIOS) openPanel('전체 화면으로 하기', '<p class="note" style="font-size:15px;line-height:1.7">아이폰에서는 <b>홈 화면에 추가</b>해서 열면 주소창 없이 전체 화면으로 할 수 있어요.</p><ol style="font-family:var(--f-body);line-height:1.9;padding-left:20px"><li>Safari 아래쪽 <b>공유 버튼</b>(네모에 위 화살표)</li><li><b>홈 화면에 추가</b></li><li>홈 화면에 생긴 <b>도트마을</b> 아이콘으로 열기</li></ol><p class="note">안드로이드는 메뉴의 "전체 화면"을 누르거나, Chrome 메뉴 → 홈 화면에 추가 하면 돼요.</p>', { half:true });
+}
+// first touch in the game → full screen on phones that allow it (Android)
+let autoFullTried = false;
+document.addEventListener('pointerdown', e => {
+  if (autoFullTried || !G.started || isIOS || standalone() || fsEl()) return;
+  if (!matchMedia('(pointer: coarse)').matches) return;
+  if (e.target.closest('#panel') || e.target.closest('input')) return;
+  autoFullTried = true; goFull();
+}, true);
+['fullscreenchange','webkitfullscreenchange'].forEach(ev => document.addEventListener(ev, () => setTimeout(resize, 120)));
+window.addEventListener('orientationchange', () => { setTimeout(resize, 250); setTimeout(resize, 700); });
+if (window.visualViewport) window.visualViewport.addEventListener('resize', () => setTimeout(resize, 60));
+
+/* ---------- gifts from the admin (web version) ---------- */
+const giftDone = new Set();
+function giftLabel(g){
+  if (g.kind === 'acorn') return '도토리 ' + g.n + '개';
+  if (g.kind === 'item') return (ITEM[g.id] ? ITEM[g.id].name : g.id);
+  if (g.kind === 'furn') return (FURN[g.id] ? FURN[g.id].name : g.id) + (g.n > 1 ? ' ' + g.n + '개' : '');
+  if (g.kind === 'seed') return (CROPS[g.id] ? CROPS[g.id].name + ' 씨앗' : g.id) + ' ' + g.n + '개';
+  return '선물';
+}
+function applyGifts(v){
+  if (!NETON() || !G.started || !G.me || !v) return;
+  const got = [];
+  Object.entries(v).forEach(([k, j]) => {
+    if (giftDone.has(k)) return; giftDone.add(k);
+    let g = null; try{ g = JSON.parse(j); }catch(e){}
+    window.DVNet.remove('gifts/' + window.DVNet.session.pid + '/' + k);
+    if (!g) return; const n = Math.max(1, Math.min(99999, Math.round(Number(g.n) || 1)));
+    if (g.kind === 'acorn') G.me.acorns += n;
+    else if (g.kind === 'item' && ITEM[g.id]){ G.me.owned = G.me.owned || {}; G.me.owned[g.id] = 1; if (G.me.broken) delete G.me.broken[g.id]; }
+    else if (g.kind === 'furn' && FURN[g.id]){ G.me.furn = G.me.furn || {}; G.me.furn[g.id] = (G.me.furn[g.id] || 0) + n; }
+    else if (g.kind === 'seed' && CROPS[g.id]){ G.me.seeds = G.me.seeds || {}; G.me.seeds[g.id] = (G.me.seeds[g.id] || 0) + n; }
+    else return;
+    got.push(giftLabel(Object.assign({}, g, { n })) + (g.msg ? ' · "' + g.msg + '"' : ''));
+  });
+  if (!got.length) return;
+  saveMe(true); updateHud(); playSfx && playSfx('jump'); doAnim('cheer');
+  pop('🎁 관리자 선물이 도착했어요!', got.join('\n'));
+}
+let lastGifts = null;
+if (window.DVNet) window.DVNet.ready.then(S => window.DVNet.on('gifts/' + S.pid, v => { lastGifts = v; applyGifts(v); }));
+Store.on('loaded', () => setTimeout(() => applyGifts(lastGifts), 1500));
+
+/* ---------- village chat (web version) ---------- */
+function chatPid(m){ return m && m.p; }
+function slotOfPid(p){ const n = Number(String(p || '').slice(1)); return isNaN(n) ? -1 : n; }
+function onChat(v){
+  const list = Object.entries(v || {}).map(([k, j]) => { let m = null; try{ m = JSON.parse(j); }catch(e){} return m && Object.assign({ k }, m); }).filter(Boolean).sort((a,b) => a.at - b.at);
+  const known = new Set(chatMsgs.map(m => m.k));
+  const fresh = list.filter(m => !known.has(m.k));
+  chatMsgs = list;
+  if (!chatFirst) fresh.forEach(m => {
+    const s = slotOfPid(m.p), c = chars[s];
+    if (c && (c.g.visible || s === G.slot)) chatSay(c, m.t);
+    if (s !== G.slot && G.panel !== 'chat'){ chatUnread++; if (!c || !c.g.visible) toast('💬 ' + m.n + ': ' + m.t, 2600); }
+  });
+  else chatUnread = list.filter(m => m.at > chatSeenAt && slotOfPid(m.p) !== (window.DVNet.session || {}).slot).length;
+  chatFirst = false;
+  if (G.panel === 'chat') renderChat(); syncMenuDot();
+  // keep the history short
+  if (list.length > 80 && Math.random() < 0.3) list.slice(0, list.length - 60).forEach(m => window.DVNet.remove('chat/' + m.k));
+}
+if (window.DVNet) window.DVNet.ready.then(() => window.DVNet.onLast('chat', 60, onChat));
+function renderChat(){
+  const box = $('#chatList'); if (!box) return; const me = G.slot;
+  box.innerHTML = chatMsgs.length ? chatMsgs.map(m => '<div class="chatmsg'+(slotOfPid(m.p) === me ? ' me' : '')+'"><b>'+esc(m.n || '이웃')+' · '+ago(m.at)+'</b>'+esc(m.t)+'</div>').join('') : '<div class="chatmsg sys">아직 대화가 없어요. 첫 인사를 남겨 봐요!</div>';
+  box.scrollTop = box.scrollHeight;
+}
+function openChat(){
+  if (!NETON()) return;
+  G.panel = 'chat';
+  openPanel('마을 채팅', '<div id="chatList" class="chatlist"></div><div class="chatin"><input id="chatTxt" maxlength="100" placeholder="마을 사람들에게 말하기" enterkeyhint="send" autocomplete="off"><button class="go" id="chatSend">보내기</button></div><p class="note">말하면 내 캐릭터 머리 위에도 말풍선이 떠요.</p>', { half:true });
+  chatUnread = 0; chatSeenAt = Date.now(); LS.set('dv.chatSeen', chatSeenAt); syncMenuDot(); renderChat();
+  const send = () => { const t = $('#chatTxt').value.trim(); if (!t) return; $('#chatTxt').value = '';
+    window.DVNet.push('chat', JSON.stringify({ p:window.DVNet.session.pid, n:G.me.name, t:t.slice(0, 100), at:Date.now() })); };
+  $('#chatSend').addEventListener('click', send);
+  $('#chatTxt').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter' && !e.isComposing){ e.preventDefault(); send(); } });
+}
+// speech bubbles over players
+function chatSay(c, text){
+  if (!c.bub){ c.bub = document.createElement('div'); c.bub.className = 'say chat'; $('#labels').appendChild(c.bub); }
+  c.bub.textContent = text; c.bub.hidden = false; c.bubUntil = performance.now() + Math.max(5000, text.length*180);
+}
+function chatBubbleTick(){
+  const now = performance.now(), W = window.innerWidth, H = window.innerHeight;
+  Object.values(chars).forEach(c => { const b = c.bub; if (!b || b.hidden) return;
+    if (now > c.bubUntil || !c.g.visible || G.focus){ b.hidden = true; return; }
+    _v.set(c.g.position.x, c.g.position.y + 2.3, c.g.position.z).project(cam); if (_v.z > 1){ b.style.left = '-999px'; return; }
+    b.style.left = ((_v.x+1)/2*W)+'px'; b.style.top = ((1-_v.y)/2*H)+'px'; });
+}
+// name labels sit a bit higher while a bubble is showing → keep both readable
+const _featTick9b = featTick;
+featTick = function(dt, tsec){ _featTick9b(dt, tsec); chatBubbleTick(); };
+
+/* ---------- catalog for the admin page (used at build time) ---------- */
+window.DV_CATALOG = () => ({
+  items: SHOP.filter(it => it.price > 0 || it.cat === 'set').map(it => ({ id:it.id, name:it.name, cat:(CATS.find(c => c[0] === it.cat) || [it.cat, it.cat])[1], price:it.price })),
+  furn: Object.entries(FURN).filter(([id,f]) => !f.fixture && f.price).map(([id,f]) => ({ id, name:f.name, price:f.price })),
+  seeds: Object.entries(CROPS).map(([id,c]) => ({ id, name:c.name + ' 씨앗', price:c.seed })),
+});
+
 
 $('#roomBtn').addEventListener('click', () => G.panel==='decor' ? closePanel() : openDecorate());
 $('#talk').addEventListener('click', e => { if (e.target.closest('[data-o],[data-g]')) return; dialogTap(); });
@@ -5848,3 +6042,5 @@ window.__dv = { canStand:(x,z)=>canStand(x,z), charBlock:(x,z)=>charBlock(chars[
 Object.assign(window.__dv, { instPlayPose:(...a)=>instPlayPose(...a), patientTalk:(id)=>patientTalk(id), onTap:(x,y)=>onTap(x,y), sideStep:(...a)=>sideStep(...a), playerHidden:()=>playerHidden(), cops:()=>G.cops, swingSeatWorld:(...a)=>swingSeatWorld(...a), objMeshes, BUILD, isletAt });
 })();
 </script>
+
+</body></html>
