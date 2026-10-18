@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>도트마을 관리자</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f1fb;--card:#fff;--ink:#4a3f63;--soft:#8a7fa3;--line:#e6ddf2;--accent:#8e7ae0;--accent2:#5fb894;--bad:#e0647a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#1f1b2b;--card:#2a2539;--ink:#ece6f8;--soft:#a99fc4;--line:#3a3350}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Gowun Dodum',system-ui,sans-serif;font-size:15px}
+main{max-width:720px;margin:0 auto;padding:20px 16px 60px}
+h1{font-family:Jua,sans-serif;font-weight:400;font-size:26px;margin:4px 0 2px}
+h2{font-family:Jua,sans-serif;font-weight:400;font-size:19px;margin:0 0 10px}
+.sub{color:var(--soft);margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
+label{display:block;font-size:13px;color:var(--soft);margin:8px 0 4px}
+input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:inherit}
+button{font:inherit;border:0;border-radius:12px;padding:11px 14px;background:var(--line);color:var(--ink);cursor:pointer}
+button.go{background:var(--accent);color:#fff;width:100%;margin-top:12px;font-family:Jua,sans-serif;font-size:16px}
+button.small{padding:7px 10px;font-size:13px}
+button.danger{background:transparent;color:var(--bad);border:1px solid var(--bad)}
+button:disabled{opacity:.5}
+.row{display:flex;gap:8px;align-items:end;flex-wrap:wrap}
+.row>div{flex:1 1 140px}
+.msg{min-height:20px;margin:10px 0 0;font-size:14px;color:var(--accent2)}
+.msg.bad{color:var(--bad)}
+.vh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+.cnt{color:var(--soft);font-size:13px}
+.mem{display:grid;grid-template-columns:28px 1fr;gap:6px 10px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.mem:first-of-type{border-top:0}
+.slot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Jua,sans-serif;color:#fff;font-size:14px}
+.who b{font-weight:400;font-family:Jua,sans-serif;font-size:16px}
+.who span{display:block;color:var(--soft);font-size:13px}
+.acts{grid-column:2;display:flex;gap:6px;flex-wrap:wrap}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--line);margin-left:6px;vertical-align:middle}
+.tag.on{background:#d8f2e6;color:#2f7a5a}
+.who span.tag{display:inline-block}
+.empty{color:var(--soft);font-size:14px}
+</style>
+</head>
+<body>
+<main>
+  <h1>도트마을 관리자</h1>
+  <p class="sub">들어올 수 있는 구글 계정을 미리 등록하고, 마을(최대 10명)을 관리해요.</p>
+  <div id="app"><div class="card">불러오는 중…</div></div>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
