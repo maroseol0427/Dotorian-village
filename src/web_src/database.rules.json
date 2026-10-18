@@ -1,0 +1,67 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "config": {
+      ".read": true,
+      "adminUid": {
+        ".write": "auth != null && auth.token.email_verified === true && !data.exists() && newData.val() === auth.uid"
+      },
+      "adminEmail": {
+        ".write": "auth != null && root.child('config/adminUid').val() === auth.uid"
+      }
+    },
+    "allowed": {
+      ".read": "auth != null && root.child('config/adminUid').val() === auth.uid",
+      ".write": "auth != null && root.child('config/adminUid').val() === auth.uid",
+      "$key": {
+        ".read": "auth != null && auth.token.email.replace('.', ',') === $key",
+        ".validate": "newData.hasChildren(['village','slot','pid']) && newData.child('slot').isNumber() && newData.child('slot').val() >= 0 && newData.child('slot').val() <= 9"
+      }
+    },
+    "villages": {
+      ".read": "auth != null && root.child('config/adminUid').val() === auth.uid",
+      ".write": "auth != null && root.child('config/adminUid').val() === auth.uid",
+      "$v": {
+        ".read": "auth != null && auth.token.email_verified === true && root.child('allowed').child(auth.token.email.replace('.', ',')).child('village').val() === $v",
+        "placed": {
+          "$k": {
+            ".write": "auth != null && auth.token.email_verified === true && root.child('allowed').child(auth.token.email.replace('.', ',')).child('village').val() === $v",
+            ".validate": "newData.isString() && newData.val().length < 20000"
+          }
+        },
+        "players": {
+          "$pid": {
+            ".write": "auth != null && auth.token.email_verified === true && root.child('allowed').child(auth.token.email.replace('.', ',')).child('village').val() === $v && root.child('allowed').child(auth.token.email.replace('.', ',')).child('pid').val() === $pid",
+            ".validate": "newData.isString() && newData.val().length < 300000"
+          }
+        },
+        "mail": {
+          "$m": {
+            ".write": "auth != null && auth.token.email_verified === true && root.child('allowed').child(auth.token.email.replace('.', ',')).child('village').val() === $v",
+            ".validate": "newData.isString() && newData.val().length < 2000"
+          }
+        },
+        "live": {
+          "$pid": {
+            ".write": "auth != null && auth.token.email_verified === true && root.child('allowed').child(auth.token.email.replace('.', ',')).child('village').val() === $v && root.child('allowed').child(auth.token.email.replace('.', ',')).child('pid').val() === $pid"
+          }
+        },
+        "gifts": {
+          "$pid": {
+            "$g": {
+              ".validate": "newData.isString() && newData.val().length < 2000",
+              ".write": "auth != null && auth.token.email_verified === true && root.child('allowed').child(auth.token.email.replace('.', ',')).child('village').val() === $v && root.child('allowed').child(auth.token.email.replace('.', ',')).child('pid').val() === $pid && !newData.exists()"
+            }
+          }
+        },
+        "chat": {
+          "$m": {
+            ".write": "auth != null && auth.token.email_verified === true && root.child('allowed').child(auth.token.email.replace('.', ',')).child('village').val() === $v",
+            ".validate": "newData.isString() && newData.val().length < 1000"
+          }
+        }
+      }
+    }
+  }
+}
