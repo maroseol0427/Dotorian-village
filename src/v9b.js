@@ -56,7 +56,7 @@ function giftLabel(g){
 }
 function applyGifts(v){
   if (!NETON() || !G.started || !G.me || !v) return;
-  const got = [];
+  const got = [], froms = new Set();
   Object.entries(v).forEach(([k, j]) => {
     if (giftDone.has(k)) return; giftDone.add(k);
     let g = null; try{ g = JSON.parse(j); }catch(e){}
@@ -67,11 +67,11 @@ function applyGifts(v){
     else if (g.kind === 'furn' && FURN[g.id]){ G.me.furn = G.me.furn || {}; G.me.furn[g.id] = (G.me.furn[g.id] || 0) + n; }
     else if (g.kind === 'seed' && CROPS[g.id]){ G.me.seeds = G.me.seeds || {}; G.me.seeds[g.id] = (G.me.seeds[g.id] || 0) + n; }
     else return;
-    got.push(giftLabel(Object.assign({}, g, { n })) + (g.msg ? ' · "' + g.msg + '"' : ''));
+    got.push(esc(giftLabel(Object.assign({}, g, { n }))) + (g.msg ? ' · "' + esc(String(g.msg).slice(0, 40)) + '"' : '')); if (g.from) froms.add(String(g.from).slice(0, 12)); else froms.add('관리자');
   });
   if (!got.length) return;
   saveMe(true); updateHud(); playSfx && playSfx('jump'); doAnim('cheer');
-  pop('🎁 관리자 선물이 도착했어요!', got.join('\n'));
+  const fl = [...froms]; pop('🎁 ' + (fl.length === 1 ? (fl[0] === '관리자' ? '관리자 선물이 도착했어요!' : esc(fl[0]) + '님이 선물을 보냈어요!') : '선물이 도착했어요!'), got.join('<br>') + (fl.length > 1 ? '<br><small>보낸 사람: ' + esc(fl.join(', ')) + '</small>' : ''));
 }
 let lastGifts = null;
 if (window.DVNet) window.DVNet.ready.then(S => window.DVNet.on('gifts/' + S.pid, v => { lastGifts = v; applyGifts(v); }));
@@ -130,7 +130,7 @@ featTick = function(dt, tsec){ _featTick9b(dt, tsec); chatBubbleTick(); };
 
 /* ---------- catalog for the admin page (used at build time) ---------- */
 window.DV_CATALOG = () => ({
-  items: SHOP.filter(it => it.price > 0 || it.cat === 'set').map(it => ({ id:it.id, name:it.name, cat:(CATS.find(c => c[0] === it.cat) || [it.cat, it.cat])[1], price:it.price })),
+  items: SHOP.filter(it => it.price > 0 || it.cat === 'set' || it.cat === 'acc' || it.hw).map(it => ({ id:it.id, name:it.name, cat:(CATS.find(c => c[0] === it.cat) || [it.cat, it.cat])[1], price:it.price })),
   furn: Object.entries(FURN).filter(([id,f]) => !f.fixture && f.price).map(([id,f]) => ({ id, name:f.name, price:f.price })),
   seeds: Object.entries(CROPS).map(([id,c]) => ({ id, name:c.name + ' 씨앗', price:c.seed })),
 });

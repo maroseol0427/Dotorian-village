@@ -256,6 +256,12 @@ textarea{resize:none;height:76px}
 .chatin input{flex:1;min-width:0;font:inherit;font-family:var(--f-body);font-size:16px;padding:11px 14px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--ink)}
 .chatin button{flex:0 0 auto}
 #labels .say.chat{background:#fff;border:2px solid #b9e6cf}
+#labels .say.emo{font-size:26px;line-height:1;padding:5px 8px;border-radius:16px;background:#fff;border:2px solid #ffd0e0;font-family:system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif}
+#labels .say.emo.popin{animation:emoPop .35s cubic-bezier(.3,1.6,.5,1)}
+@keyframes emoPop{from{transform:translate(-50%,-100%) scale(.3)}to{transform:translate(-50%,-100%) scale(1)}}
+.emogrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.emogrid button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px;border-radius:16px;font-size:13px}
+.emogrid button span{font-size:28px;line-height:1.1;font-family:system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif}
 </style>
 
 <canvas id="gl"></canvas>
@@ -278,6 +284,8 @@ textarea{resize:none;height:76px}
     <button data-m="bWard"><span class="ico" data-ico="shirt"></span>옷장</button>
     <button data-m="bMail"><span class="ico" data-ico="mail"></span>편지<span class="badge" id="mailBadge2" hidden>0</span></button>
     <button data-m="chat" class="netonly" hidden><span class="ico" data-ico="chat"></span>채팅<span class="badge" id="chatBadge2" hidden>0</span></button>
+    <button data-m="emote"><span class="ico" data-ico="smile"></span>감정표현</button>
+    <button data-m="giftsend" class="netonly" hidden><span class="ico" data-ico="gift"></span>선물 보내기</button>
     <button data-m="full"><span class="ico" data-ico="expand"></span>전체 화면</button>
     <button data-m="bSet"><span class="ico" data-ico="gear"></span>설정</button>
   </div>

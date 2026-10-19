@@ -107,13 +107,39 @@ const SHOP = [
   { id:'tambourine', cat:'music', name:'탬버린', price:90, v:{ style:'tambourine', c:'#ffd34e' } },
   { id:'trumpet', cat:'music', name:'트럼펫', price:300, v:{ style:'trumpet', c:'#ffd36a' } },
   { id:'maracas', cat:'music', name:'마라카스', price:70, v:{ style:'maracas', c:'#ff8fa6' } },
+  // ---- 장신구 ----
+  { id:'acc_pearl', cat:'acc', name:'진주 목걸이', price:180, v:{ style:'pearl' } },
+  { id:'acc_locket', cat:'acc', name:'하트 펜던트', price:150, v:{ style:'locket', c:'#ff7fa8' } },
+  { id:'acc_clover', cat:'acc', name:'네잎클로버 목걸이', price:140, v:{ style:'clover', c:'#5fbf5a' } },
+  { id:'acc_choker', cat:'acc', name:'방울 초커', price:110, v:{ style:'choker', c:'#9a86e0' } },
+  { id:'acc_starear', cat:'acc', name:'별 귀걸이', price:120, v:{ style:'starear', c:'#ffd34e' } },
+  { id:'acc_ribbon', cat:'acc', name:'큰 리본 핀', price:90, v:{ style:'ribbon', c:'#ff8fb3' } },
+  { id:'acc_sakura', cat:'acc', name:'벚꽃 머리핀', price:100, v:{ style:'sakura', c:'#ffc2d6' } },
+  // 루루의 특별한 선물 (상점에서 안 팔아요)
+  { id:'sp_tiara', cat:'acc', name:'별빛 티아라', price:0, special:true, v:{ style:'tiara', c:'#ff9fc8' } },
+  { id:'sp_halo', cat:'acc', name:'천사 링', price:0, special:true, v:{ style:'halo', c:'#ffe27a' } },
+  { id:'sp_butterfly', cat:'acc', name:'나비 머리핀', price:0, special:true, v:{ style:'butterfly', c:'#c8b0f8', c2:'#ffb3d9' } },
+  { id:'sp_moonear', cat:'acc', name:'초승달 귀걸이', price:0, special:true, v:{ style:'moonear', c:'#ffe08a' } },
+  { id:'sp_sparkle', cat:'acc', name:'반짝반짝 요정 별', price:0, special:true, v:{ style:'sparkle' } },
+  { id:'sp_antler', cat:'acc', name:'루루 사슴뿔 머리띠', price:0, special:true, v:{ style:'antler', c:'#ffb3c6', c2:'#7a4a2c' } },
+  { id:'sp_crystal', cat:'acc', name:'수정 목걸이', price:0, special:true, v:{ style:'crystal', c:'#bfe8ff' } },
+  { id:'sp_rainbow', cat:'acc', name:'무지개 머리핀', price:0, special:true, v:{ style:'rainbow' } },
+  // ---- 할로윈 한정 (이벤트 기간에만 팔아요) ----
+  { id:'hw_witch', cat:'set', name:'꼬마 마녀 옷', price:380, hw:true, v:{ top:{ style:'robe', c1:'#5b3f8f', c2:'#ff9f3a', sleeve:'long' }, lower:{ style:'longskirt', c:'#3a2c55' }, hat:{ style:'wizard', c:'#2e2440' }, shoes:{ style:'boot', c:'#2e2440' } } },
+  { id:'hw_vampire', cat:'set', name:'뱀파이어 옷', price:380, hw:true, v:{ top:{ style:'tux', c1:'#26263a', c2:'#d93a3a', sleeve:'long' }, lower:{ style:'pants', c:'#26263a' }, back:{ style:'cape', c:'#2a2230' }, shoes:{ style:'shoe', c:'#1e1e28' } } },
+  { id:'hw_ghost', cat:'set', name:'꼬마 유령 옷', price:300, hw:true, v:{ top:{ style:'robe', c1:'#ffffff', c2:'#c8c8e0', sleeve:'long' }, lower:{ style:'longskirt', c:'#ffffff' }, hat:{ style:'ghosthood', c:'#ffffff', c2:'#e6e6f2' } } },
+  { id:'hw_pumpkin', cat:'hat', name:'꼬마 호박 모자', price:120, hw:true, v:{ style:'pumpkin', c:'#ff9a3a' } },
+  { id:'hw_witchhat', cat:'hat', name:'마녀 모자', price:180, hw:true, v:{ style:'wizard', c:'#2e2440' } },
+  { id:'hw_batwings', cat:'back', name:'박쥐 날개', price:260, hw:true, v:{ style:'batwings', c:'#3a2f4a', c2:'#6a4f8a' } },
+  { id:'hw_bag', cat:'hand', name:'호박 사탕 바구니', price:90, hw:true, v:{ style:'pumpkinbag', c:'#ff9a3a' } },
+  { id:'hw_candy', cat:'hand', name:'주황 막대사탕', price:25, hw:true, v:{ style:'lollipop', c:'#ff9a3a' } },
   // ---- 탈것 ----
   { id:'bike', cat:'ride', name:'자전거', price:200, v:{ speed:1.6, c:'#4fc7a4' } },
   { id:'scooter', cat:'ride', name:'스쿠터', price:480, v:{ speed:2.0, c:'#ef6f5e' } },
   { id:'car', cat:'ride', name:'경차', price:1000, v:{ speed:2.6, c:'#ffcf3a' } },
 ];
 const ITEM = Object.fromEntries(SHOP.map(x => [x.id, x]));
-const CATS = [['top','상의'],['bottom','하의'],['set','세트·코스튬'],['hat','모자'],['face','안경'],['shoes','신발'],['back','등'],['hand','손'],['music','악기'],['ride','탈것']];
+const CATS = [['top','상의'],['bottom','하의'],['set','세트·코스튬'],['hat','모자'],['face','안경'],['shoes','신발'],['back','등'],['hand','손'],['acc','장신구'],['music','악기'],['ride','탈것']];
 const DEFAULT_LOOK = { skin:'#ffd9b8', hair:'short', hairColor:'#5b3a24', eyes:'round', mouth:'smile' };
 function lookOf(p){
   const lk = Object.assign({}, DEFAULT_LOOK, p.look || {}), w = p.wear || {};
@@ -122,5 +148,5 @@ function lookOf(p){
   const set = v(w.set);
   if (set){ top = set.top; lower = set.lower; hat = set.hat || null; back = set.back || null; shoes = set.shoes || null; }
   if (w.hat) hat = v(w.hat); if (w.back) back = v(w.back); if (w.shoes) shoes = v(w.shoes);
-  return Object.assign(lk, { top, lower, hat, back, shoes: shoes || ITEM.sneaker_w.v, face: v(w.face), hand: v(w.hand) });
+  return Object.assign(lk, { top, lower, hat, back, shoes: shoes || ITEM.sneaker_w.v, face: v(w.face), hand: v(w.hand), acc: v(w.acc) });
 }

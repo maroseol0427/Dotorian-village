@@ -51,7 +51,7 @@
           "$pid": {
             "$g": {
               ".validate": "newData.isString() && newData.val().length < 2000",
-              ".write": "auth != null && auth.token.email_verified === true && root.child('allowed').child(auth.token.email.replace('.', ',')).child('village').val() === $v && root.child('allowed').child(auth.token.email.replace('.', ',')).child('pid').val() === $pid && !newData.exists()"
+              ".write": "auth != null && auth.token.email_verified === true && root.child('allowed').child(auth.token.email.replace('.', ',')).child('village').val() === $v && ((root.child('allowed').child(auth.token.email.replace('.', ',')).child('pid').val() === $pid && !newData.exists()) || (!data.exists() && newData.exists()))"
             }
           }
         },

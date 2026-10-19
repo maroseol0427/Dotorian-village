@@ -16,7 +16,7 @@ function liveTick(dt){
   const me = chars[G.slot]; if (!me) return;
   liveSendT -= dt;
   if (liveSendT <= 0){ liveSendT = 0.15;
-    const st = { x:r2(me.x), z:r2(me.z), f:r2(me.g.rotation.y), m:(ctl.wasMoving || me.path.length) ? 1 : 0, j:r2(me.jy || 0), e:r2(me.elev || 0), i:G.inside ? 1 : 0, s:G.sit ? 1 : 0, a:G.anim ? G.anim.type : 0, p:G.music ? 1 : 0 };
+    const st = { x:r2(me.x), z:r2(me.z), f:r2(me.g.rotation.y), m:(ctl.wasMoving || me.path.length) ? 1 : 0, j:r2(me.jy || 0), e:r2(me.elev || 0), i:G.inside ? 1 : 0, s:G.sit ? 1 : 0, a:G.anim ? G.anim.type : 0, p:G.music ? 1 : 0, em:G.emo ? G.emo.id + ':' + G.emo.n : 0 };
     window.DVNet.sendLive(st);
   }
   // move everybody else toward where they really are
