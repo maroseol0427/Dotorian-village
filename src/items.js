@@ -21,6 +21,12 @@ const SHOP = [
   { id:'cardigan_pink', cat:'top', name:'딸기우유 카디건', price:120, v:{ style:'cardigan', c1:'#ffc2d6', c2:'#fff8e8', sleeve:'long' } },
   { id:'frill_lav', cat:'top', name:'라벤더 프릴 블라우스', price:110, v:{ style:'frill', c1:'#d8c8ff' } },
   { id:'varsity', cat:'top', name:'야구 점퍼', price:160, v:{ style:'varsity', c1:'#3a5aa8', c2:'#fff4dc', sleeve:'long' } },
+  { id:'t_berry', cat:'top', name:'딸기우유 티셔츠', price:70, v:{ style:'berry', c1:'#ffe4ec' } },
+  { id:'t_puffer', cat:'top', name:'몽글 패딩 점퍼', price:220, v:{ style:'puffer', c1:'#bfe0ff', c2:'#ffffff', sleeve:'long' } },
+  { id:'t_vest', cat:'top', name:'아가일 니트 조끼', price:140, v:{ style:'vest', c1:'#c8a8e8', c2:'#ffe08a' } },
+  { id:'t_rainbow', cat:'top', name:'무지개 스웨터', price:180, v:{ style:'rainbow', c1:'#fff6ea', sleeve:'long' } },
+  { id:'t_cloud', cat:'top', name:'구름 하늘 티셔츠', price:70, v:{ style:'cloud', c1:'#9ad0ff' } },
+  { id:'t_collar', cat:'top', name:'동그란 카라 블라우스', price:130, v:{ style:'collar', c1:'#ffd6e4', c2:'#ffffff' } },
   // ---- 하의 ----
   { id:'jeans', cat:'bottom', name:'청바지', price:0, v:{ style:'pants', c:'#3a5a8c' } },
   { id:'pants_black', cat:'bottom', name:'검정 바지', price:50, v:{ style:'pants', c:'#2f2f3a' } },
@@ -34,6 +40,9 @@ const SHOP = [
   { id:'skirt_mint', cat:'bottom', name:'민트 미니스커트', price:60, v:{ style:'skirt', c:'#8fdcc0' } },
   { id:'longskirt_sky', cat:'bottom', name:'하늘 롱스커트', price:80, v:{ style:'longskirt', c:'#a8d4f4' } },
   { id:'shorts_pink', cat:'bottom', name:'분홍 반바지', price:45, v:{ style:'shorts', c:'#ffb3c6' } },
+  { id:'b_tutu', cat:'bottom', name:'발레 튀튀 스커트', price:150, v:{ style:'tutu', c:'#ffa8c8' } },
+  { id:'b_balloon', cat:'bottom', name:'몽글 풍선 치마', price:120, v:{ style:'balloon', c:'#c8b0f8', dots:'#ffffff' } },
+  { id:'b_cargo', cat:'bottom', name:'주머니 카고 바지', price:110, v:{ style:'cargo', c:'#8a9a6a' } },
   // ---- 세트 · 코스튬 ----
   { id:'overalls', cat:'set', name:'멜빵바지 세트', price:160, v:{ top:{ style:'overalls', c1:'#5b7fd1', c2:'#fff4d6' }, lower:{ style:'pants', c:'#5b7fd1' } } },
   { id:'dress_red', cat:'set', name:'빨간 원피스', price:150, v:{ top:{ style:'dress', c1:'#ef6f5e', c2:'#fff4e6' }, lower:{ style:'skirt', c:'#ef6f5e' } } },
@@ -59,6 +68,12 @@ const SHOP = [
   { id:'doctor', cat:'set', name:'의사 가운', price:0, v:{ top:{ style:'chef', c1:'#ffffff', c2:'#8fc8f0', sleeve:'long' }, lower:{ style:'pants', c:'#cfe3ff' } } },
   { id:'firefighter', cat:'set', name:'소방관 옷', price:0, v:{ top:{ style:'rain', c1:'#ff9a7a', sleeve:'long' }, lower:{ style:'pants', c:'#ff9a7a' }, hat:{ style:'rainhat', c:'#ffd34e' }, shoes:{ style:'boot', c:'#5a4a5a' } } },
   { id:'captain', cat:'set', name:'선장 옷', price:0, v:{ top:{ style:'sailor', c1:'#ffffff', c2:'#2f4f8a' }, lower:{ style:'pants', c:'#2f4f8a' }, hat:{ style:'cap', c:'#2f4f8a' } } },
+  { id:'set_bee', cat:'set', name:'꿀벌 옷', price:420, v:{ top:{ style:'bee', c1:'#ffd23a', sleeve:'long' }, lower:{ style:'pants', c:'#2a2440' }, hat:{ style:'bee' }, back:{ style:'beewings' }, shoes:{ style:'boot', c:'#2a2440' } } },
+  { id:'set_penguin', cat:'set', name:'펭귄 잠옷', price:400, v:{ top:{ style:'penguin', c1:'#2e3448', sleeve:'long' }, lower:{ style:'pants', c:'#2e3448' }, hat:{ style:'penguinhood', c:'#2e3448', c2:'#ffffff' }, shoes:{ style:'boot', c:'#ffa53a' } } },
+  { id:'set_berry', cat:'set', name:'딸기 원피스', price:380, v:{ top:{ style:'berry', c1:'#ff8fa6' }, lower:{ style:'balloon', c:'#e8384f', dots:'#fff2a8' }, hat:{ style:'berryhat', c:'#e8384f' }, shoes:{ style:'maryjane', c:'#e8384f' } } },
+  { id:'set_frog', cat:'set', name:'개구리 우비', price:340, v:{ top:{ style:'rain', c1:'#7ac25a', sleeve:'long' }, lower:{ style:'pants', c:'#7ac25a' }, hat:{ style:'froghat', c:'#7ac25a' }, shoes:{ style:'boot', c:'#7ac25a' } } },
+  { id:'set_prince', cat:'set', name:'왕자님 옷', price:600, v:{ top:{ style:'prince', c1:'#3c5fb8', c2:'#ffffff', sleeve:'long' }, lower:{ style:'pants', c:'#f4f0f8' }, back:{ style:'cape', c:'#d93a5a' }, hat:{ style:'crown' }, shoes:{ style:'boot', c:'#2a2440' } } },
+  { id:'set_idol', cat:'set', name:'반짝 아이돌 무대의상', price:550, v:{ top:{ style:'idol', c1:'#ff8fc8', c2:'#c8b0f8' }, lower:{ style:'tutu', c:'#f0e8ff' }, hand:{ style:'mic', c:'#ff8fc8' }, shoes:{ style:'maryjane', c:'#ffffff' } } },
   // ---- 모자 ----
   { id:'cap_blue', cat:'hat', name:'파랑 야구모자', price:60, v:{ style:'cap', c:'#3c6fd1' } },
   { id:'cap_red', cat:'hat', name:'빨강 야구모자', price:60, v:{ style:'cap', c:'#ef4f5e' } },
@@ -73,18 +88,35 @@ const SHOP = [
   { id:'crown', cat:'hat', name:'황금 왕관', price:500, v:{ style:'crown' } },
   { id:'wizard_hat', cat:'hat', name:'마법사 모자', price:200, v:{ style:'wizard', c:'#6a3fa0' } },
   { id:'chef_hat', cat:'hat', name:'요리사 모자', price:120, v:{ style:'chef' } },
+  { id:'h_bonnet', cat:'hat', name:'리본 보닛', price:160, v:{ style:'bonnet', c:'#fff4e0', c2:'#ff8fb3' } },
+  { id:'h_frog', cat:'hat', name:'개구리 모자', price:130, v:{ style:'froghat', c:'#7ac25a' } },
+  { id:'h_chick', cat:'hat', name:'병아리 친구', price:150, v:{ style:'chick' } },
+  { id:'h_sunflower', cat:'hat', name:'해바라기 머리띠', price:140, v:{ style:'sunflower' } },
+  { id:'h_phones', cat:'hat', name:'하트 헤드폰', price:200, v:{ style:'headphones', c:'#c8b0f8', c2:'#ffffff' } },
+  { id:'h_bucket', cat:'hat', name:'버킷햇', price:90, v:{ style:'bucket', c:'#f2e6cf', c2:'#8a6a4a' } },
+  { id:'h_muffs', cat:'hat', name:'복슬 귀마개', price:110, v:{ style:'earmuffs', c:'#ffd6e4' } },
+  { id:'h_santa', cat:'hat', name:'산타 모자', price:120, v:{ style:'santa' } },
+  { id:'h_berry', cat:'hat', name:'딸기 모자', price:140, v:{ style:'berryhat', c:'#e8384f' } },
   // ---- 얼굴 ----
   { id:'glasses_brown', cat:'face', name:'갈색 뿔테', price:60, v:{ style:'glasses', c:'#8a5236' } },
   { id:'round_black', cat:'face', name:'동그란 안경', price:70, v:{ style:'round', c:'#2a2440' } },
   { id:'sunglasses', cat:'face', name:'선글라스', price:120, v:{ style:'sun', c:'#26263a' } },
   { id:'heart_glasses', cat:'face', name:'하트 안경', price:150, v:{ style:'heart', c:'#ff5c8a' } },
   { id:'mask', cat:'face', name:'하얀 마스크', price:30, v:{ style:'mask', c:'#ffffff' } },
+  { id:'f_starsun', cat:'face', name:'별 선글라스', price:150, v:{ style:'starsun', c:'#ff8fc8' } },
+  { id:'f_monocle', cat:'face', name:'신사 외눈 안경', price:130, v:{ style:'monocle', c:'#c8a040' } },
+  { id:'f_whiskers', cat:'face', name:'고양이 수염 분장', price:60, v:{ style:'whiskers', c:'#5a4a5a' } },
+  { id:'f_cheek', cat:'face', name:'하트 볼 스티커', price:50, v:{ style:'cheekheart', c:'#ff5c8a' } },
   // ---- 신발 ----
   { id:'sneaker_w', cat:'shoes', name:'하얀 운동화', price:0, v:{ style:'sneaker', c:'#f2f2f2' } },
   { id:'sneaker_r', cat:'shoes', name:'빨간 운동화', price:50, v:{ style:'sneaker', c:'#ef4f5e' } },
   { id:'loafer', cat:'shoes', name:'갈색 구두', price:70, v:{ style:'shoe', c:'#5a3a26' } },
   { id:'boots_brown', cat:'shoes', name:'가죽 부츠', price:90, v:{ style:'boot', c:'#6a4a32' } },
   { id:'rainboots', cat:'shoes', name:'노란 장화', price:80, v:{ style:'boot', c:'#ffcf3a' } },
+  { id:'s_bunny', cat:'shoes', name:'토끼 슬리퍼', price:90, v:{ style:'bunnyslipper', c:'#ffffff' } },
+  { id:'s_bear', cat:'shoes', name:'곰돌이 슬리퍼', price:90, v:{ style:'bearslipper', c:'#c08a5a' } },
+  { id:'s_roller', cat:'shoes', name:'롤러스케이트', price:240, v:{ style:'rollers', c:'#ffffff', c2:'#ff8fb3' } },
+  { id:'s_maryjane', cat:'shoes', name:'빨간 메리제인 구두', price:120, v:{ style:'maryjane', c:'#d93a5a' } },
   // ---- 등 ----
   { id:'backpack_red', cat:'back', name:'빨간 배낭', price:90, v:{ style:'backpack', c:'#ef4f5e' } },
   { id:'backpack_yel', cat:'back', name:'노랑 배낭', price:90, v:{ style:'backpack', c:'#ffcf3a' } },
@@ -92,6 +124,11 @@ const SHOP = [
   { id:'wings_angel', cat:'back', name:'천사 날개', price:350, v:{ style:'wings', c:'#ffffff' } },
   { id:'wings_fairy', cat:'back', name:'요정 날개', price:400, v:{ style:'wings', c:'#ffc2e0', c2:'#c8b0f8' } },
   { id:'guitar', cat:'back', name:'통기타', price:300, v:{ style:'guitar', c:'#e08a3a' } },
+  { id:'k_bear', cat:'back', name:'곰돌이 배낭', price:160, v:{ style:'bearpack', c:'#c08a5a' } },
+  { id:'k_bfly', cat:'back', name:'파스텔 나비 날개', price:420, v:{ style:'bflywings', c:'#ffb3d9', c2:'#bfe0ff' } },
+  { id:'k_turtle', cat:'back', name:'거북이 등껍질', price:200, v:{ style:'turtle', c:'#5fae6a', c2:'#f2e0a0' } },
+  { id:'k_foxtail', cat:'back', name:'복슬 여우 꼬리', price:220, v:{ style:'foxtail', c:'#f29a5a', c2:'#fff8f0' } },
+  { id:'k_dragon', cat:'back', name:'꼬마 용 날개', price:380, v:{ style:'dragon', c:'#a88ae8', c2:'#6a4fb8' } },
   // ---- 손 ----
   { id:'balloon_red', cat:'hand', name:'빨간 풍선', price:30, v:{ style:'balloon', c:'#ef4f5e' } },
   { id:'balloon_blue', cat:'hand', name:'파란 풍선', price:30, v:{ style:'balloon', c:'#5b9be8' } },
@@ -100,6 +137,14 @@ const SHOP = [
   { id:'lollipop', cat:'hand', name:'막대사탕', price:25, v:{ style:'lollipop', c:'#ff7fa8' } },
   { id:'icecream', cat:'hand', name:'딸기 아이스크림', price:20, v:{ style:'icecream', c:'#ffb3c6' } },
   { id:'teddy', cat:'hand', name:'곰인형', price:150, v:{ style:'teddy', c:'#c08a5a' } },
+  { id:'n_wand', cat:'hand', name:'반짝 별 요술봉', price:180, v:{ style:'wand', c:'#ffd34e' } },
+  { id:'n_cotton', cat:'hand', name:'구름 솜사탕', price:40, v:{ style:'cottoncandy', c:'#ffb3d9', c2:'#bfe0ff' } },
+  { id:'n_pinwheel', cat:'hand', name:'무지개 바람개비', price:50, v:{ style:'pinwheel' } },
+  { id:'n_boba', cat:'hand', name:'흑당 버블티', price:35, v:{ style:'boba', c:'#e8c8a8', c2:'#ff8fb3' } },
+  { id:'n_cat', cat:'hand', name:'고양이 인형', price:150, v:{ style:'catplush', c:'#f2b06a' } },
+  { id:'n_lantern', cat:'hand', name:'빛나는 종이 등불', price:90, v:{ style:'lantern', c:'#ffb35a' } },
+  { id:'n_heartb', cat:'hand', name:'하트 풍선', price:45, v:{ style:'heartballoon', c:'#ff6f91' } },
+  { id:'n_mic', cat:'hand', name:'반짝 마이크', price:160, v:{ style:'mic', c:'#ff8fc8' } },
   // ---- 악기 (손에 들고 연주) ----
   { id:'ukulele', cat:'music', name:'우쿨렐레', price:180, v:{ style:'ukulele', c:'#f2b06a' } },
   { id:'violin', cat:'music', name:'바이올린', price:320, v:{ style:'violin', c:'#c8784a' } },
@@ -115,6 +160,11 @@ const SHOP = [
   { id:'acc_starear', cat:'acc', name:'별 귀걸이', price:120, v:{ style:'starear', c:'#ffd34e' } },
   { id:'acc_ribbon', cat:'acc', name:'큰 리본 핀', price:90, v:{ style:'ribbon', c:'#ff8fb3' } },
   { id:'acc_sakura', cat:'acc', name:'벚꽃 머리핀', price:100, v:{ style:'sakura', c:'#ffc2d6' } },
+  { id:'acc_starband', cat:'acc', name:'별 세 개 머리띠', price:130, v:{ style:'starband', c:'#ffd34e', c2:'#ff9fc8' } },
+  { id:'acc_lei', cat:'acc', name:'꽃 목걸이 레이', price:120, v:{ style:'lei' } },
+  { id:'acc_scarf', cat:'acc', name:'줄무늬 목도리', price:110, v:{ style:'scarf', c:'#ef4f5e', c2:'#ffffff' } },
+  { id:'acc_cherry', cat:'acc', name:'체리 귀걸이', price:100, v:{ style:'cherryear', c:'#e8384f' } },
+  { id:'acc_cloud', cat:'acc', name:'졸졸 비구름 친구', price:260, v:{ style:'cloud', c:'#8fd0ff' } },
   // 루루의 특별한 선물 (상점에서 안 팔아요)
   { id:'sp_tiara', cat:'acc', name:'별빛 티아라', price:0, special:true, v:{ style:'tiara', c:'#ff9fc8' } },
   { id:'sp_halo', cat:'acc', name:'천사 링', price:0, special:true, v:{ style:'halo', c:'#ffe27a' } },
@@ -148,5 +198,5 @@ function lookOf(p){
   const set = v(w.set);
   if (set){ top = set.top; lower = set.lower; hat = set.hat || null; back = set.back || null; shoes = set.shoes || null; }
   if (w.hat) hat = v(w.hat); if (w.back) back = v(w.back); if (w.shoes) shoes = v(w.shoes);
-  return Object.assign(lk, { top, lower, hat, back, shoes: shoes || ITEM.sneaker_w.v, face: v(w.face), hand: v(w.hand), acc: v(w.acc) });
+  return Object.assign(lk, { top, lower, hat, back, shoes: shoes || ITEM.sneaker_w.v, face: v(w.face), hand: v(w.hand) || (set && set.hand) || null, acc: v(w.acc) });
 }
