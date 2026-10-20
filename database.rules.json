@@ -62,6 +62,17 @@
           }
         }
       }
+    },
+    "stats": {
+      ".read": "auth != null && root.child('config/adminUid').val() === auth.uid",
+      ".write": "auth != null && root.child('config/adminUid').val() === auth.uid",
+      "$v": {
+        "$pid": {
+          ".read": "auth != null && auth.token.email_verified === true && root.child('allowed').child(auth.token.email.replace('.', ',')).child('village').val() === $v && root.child('allowed').child(auth.token.email.replace('.', ',')).child('pid').val() === $pid",
+          ".write": "auth != null && auth.token.email_verified === true && root.child('allowed').child(auth.token.email.replace('.', ',')).child('village').val() === $v && root.child('allowed').child(auth.token.email.replace('.', ',')).child('pid').val() === $pid",
+          ".validate": "newData.hasChildren(['total']) && newData.child('total').isNumber()"
+        }
+      }
     }
   }
 }

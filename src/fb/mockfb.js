@@ -20,6 +20,7 @@
       set: v => write(path, v),
       update: v => { const d = load(K) || {}; Object.entries(v).forEach(([k,x]) => setAt(d, path + '/' + k, x)); save(K, d); setTimeout(fire, 0); return Promise.resolve(); },
       remove: () => write(path, null),
+      transaction: fn => { const d = load(K) || {}; const cur = getAt(d, path); const nv = fn(cur == null ? null : JSON.parse(JSON.stringify(cur))); if (nv !== undefined) write(path, nv); return Promise.resolve({ committed: nv !== undefined }); },
       push: v => { const k = 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); write(path + '/' + k, v); return Promise.resolve({ key:k }); },
       on: (ev, cb) => { const L = { path, cb, last:undefined }; listeners.push(L); setTimeout(fire, 0); return cb; },
       off: (ev, cb) => { const i = listeners.findIndex(L => L.path === path && (!cb || L.cb === cb)); if (i >= 0) listeners.splice(i, 1); },

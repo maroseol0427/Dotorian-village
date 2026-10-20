@@ -1,0 +1,31 @@
+const { chromium } = require('/home/claude/.npm-global/lib/node_modules/playwright');
+(async()=>{ const b=await chromium.launch({args:['--use-gl=swiftshader','--ignore-gpu-blocklist']});
+const ctx=await b.newContext({viewport:{width:390,height:844}});
+const errs=[]; const watch=(pg,n)=>{ pg.on('pageerror',e=>errs.push(n+' PE '+e.message)); pg.on('console',m=>{ if(m.type()==='error' && !m.text().includes('TUNNEL')) errs.push(n+' '+m.text().slice(0,200)); }); };
+const base='file://'+process.cwd()+'/web_test/';
+const W=ms=>new Promise(r=>setTimeout(r,ms));
+const ad=await ctx.newPage(); watch(ad,'admin'); await ad.goto(base+'admin.html'); await W(800);
+await ad.evaluate(()=>window.__mockEmail='Ritta.Boss@gmail.com'); await ad.click('#go'); await W(600);
+await ad.screenshot({path:'w_claim.png'}); await ad.click('#claim'); await W(600);
+const addP=async(em,nm,newv)=>{ await ad.fill('#nem',em); await ad.fill('#nnm',nm); if(newv){ await ad.selectOption('#nv','__new'); await ad.fill('#nvn',newv); } await ad.click('#add'); await W(500); console.log('add', await ad.textContent('#msg')); };
+await addP('mom.kim@gmail.com','엄마','family'); await addP('dad@gmail.com','아빠');
+const A=await ctx.newPage(); watch(A,'A'); await A.goto(base+'index.html'); await W(1500); await A.screenshot({path:'w_login.png'});
+await A.evaluate(()=>window.__mockEmail='stranger@gmail.com'); await A.click('#aGoogle'); await W(800);
+console.log('denied:', (await A.textContent('#authBox')).slice(0,60));
+await A.screenshot({path:'w_denied.png'});
+await A.evaluate(()=>window.__mockEmail='mom.kim@gmail.com'); await A.click('#aOther'); await W(4000);
+console.log('A started', await A.evaluate(()=>[__dv.G.started, __dv.G.slot, __dv.G.me&&__dv.G.me.name]));
+await A.evaluate(()=>__dv.closePanel());
+const B=await ctx.newPage(); watch(B,'B'); await B.goto(base+'index.html'); await W(1500);
+await B.evaluate(()=>window.__mockEmail='dad@gmail.com'); await B.click('#aGoogle'); await W(4000);
+console.log('B started', await B.evaluate(()=>[__dv.G.started, __dv.G.slot, __dv.G.me&&__dv.G.me.name]));
+await B.evaluate(()=>__dv.closePanel());
+
+await A.bringToFront(); await A.mouse.click(200,300); await W(66000);
+console.log('db stats', await A.evaluate(()=>JSON.stringify(JSON.parse(localStorage.getItem('mockfb.db')).stats)));
+// add some history for the screenshot
+await ad.evaluate(()=>{ const d=JSON.parse(localStorage.getItem('mockfb.db')); const days={}; for(let i=1;i<7;i++){ const t=new Date(); t.setDate(t.getDate()-i); const k=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'); days[k]=Math.round(600+Math.random()*5000); } const s=d.stats.family; s.p1=s.p1||{total:0,days:{},sessions:1}; Object.assign(s.p1.days, days); s.p1.total+=Object.values(days).reduce((a,b)=>a+b,0); s.p1.sessions=12; s.p1.last=Date.now()-3600e3; localStorage.setItem('mockfb.db', JSON.stringify(d)); });
+await ad.reload(); await W(2500);
+await ad.screenshot({path:'w_play.png', fullPage:true});
+console.log('errors', JSON.stringify(errs.slice(0,15),null,1));
+await b.close(); })();

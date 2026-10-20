@@ -25,11 +25,12 @@
     $('#other').onclick = async () => { await auth.signOut(); signIn(); };
   }
 
-  let allowed = {}, villages = {}, subs = [], pickV = '';
+  let allowed = {}, villages = {}, stats = {}, statsErr = false, subs = [], pickV = '', playSort = 'week';
   function dashboard(){
     subs.forEach(f => f()); subs = [];
     const watch = (path, fn) => { const r = db.ref(path); const h = r.on('value', s => { fn(s.val() || {}); render(); }, e => msg(errText(e), true)); subs.push(() => r.off('value', h)); };
     watch('allowed', v => allowed = v); watch('villages', v => villages = v);
+    { const r = db.ref('stats'); const h = r.on('value', s => { stats = s.val() || {}; statsErr = false; render(); }, () => { statsErr = true; render(); }); subs.push(() => r.off('value', h)); }
     render();
   }
   function render(){
@@ -45,6 +46,7 @@
       '<button class="go" id="add">등록하기</button><p id="msg" class="msg"></p>'+
       '<p class="sub" style="margin:8px 0 0;font-size:13px">등록한 사람은 게임 첫 화면에서 "Google 계정으로 시작하기"를 누르고 이 계정을 고르면 바로 들어와요.</p></div>'+
       (vnames.length ? giftCard(byV, vnames) : '')+
+      (vnames.length ? playCard(byV, vnames) : '')+
       (vnames.length ? vnames.map(v => villageCard(v, byV[v])).join('') : '<div class="card empty">아직 등록한 계정이 없어요.</div>')+
       '<div class="card"><span class="sub" style="font-size:13px">관리자: '+esc((auth.currentUser||{}).email||'')+'</span><br><button class="small" id="out" style="margin-top:8px">관리자 로그아웃</button></div>';
     $('#nem').value = keep.em; $('#nnm').value = keep.nm; if (pickV){ $('#nv').value = pickV; pickV = ''; $('#nvn').value = ''; } else if (keep.v) $('#nv').value = keep.v; $('#nvn').value = keep.nv;
@@ -54,6 +56,7 @@
     if ($('#gKind')){ const gk = keepG; if (gk.to) $('#gTo').value = gk.to; if (gk.kind) $('#gKind').value = gk.kind; fillGiftItems(); if (gk.item) $('#gItem').value = gk.item; if (gk.n) $('#gN').value = gk.n; if (gk.msg) $('#gMsg').value = gk.msg;
       $('#gKind').onchange = fillGiftItems; $('#gSend').onclick = sendGift; gmsg(lastG[0], lastG[1]); } $('#out').onclick = () => auth.signOut();
     app.querySelectorAll('[data-act]').forEach(b => b.onclick = () => act(b.dataset.act, b.dataset.k));
+    app.querySelectorAll('[data-ps]').forEach(b => b.onclick = () => { playSort = b.dataset.ps; render(); });
   }
   let keepG = {}, lastG = ['', false];
   const gmsg = (t, bad) => { lastG = [t || '', !!bad]; const m = $('#gMsgOut'); if (m){ m.textContent = t || ''; m.classList.toggle('bad', !!bad); } };
@@ -86,6 +89,29 @@
       const what = kind === 'acorn' ? '도토리 '+n+'개' : ($('#gItem').selectedOptions[0] || {}).textContent + (kind === 'item' ? '' : ' '+n+'개');
       gmsg((targets.length > 1 ? targets.length+'명에게 ' : targets[0].name+'에게 ')+what+' 선물을 보냈어요!'); }
     catch(e){ gmsg(errText(e), true); }
+  }
+  /* ---------- play time (admin only) ---------- */
+  const dayKey = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const fmt = sec => { sec = Math.round(sec || 0); const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60); return h ? h + '시간 ' + (m ? m + '분' : '') : m ? m + '분' : (sec ? '1분 미만' : '0분'); };
+  function lastDays(n){ const out = []; for (let i = n - 1; i >= 0; i--){ const d = new Date(); d.setDate(d.getDate() - i); out.push(dayKey(d)); } return out; }
+  function playCard(byV, vnames){
+    if (statsErr) return '<div class="card"><h2>플레이 시간</h2><p class="msg bad">플레이 시간을 불러오지 못했어요. Firebase 데이터베이스 규칙을 새 버전으로 다시 게시해 주세요.</p></div>';
+    const days7 = lastDays(7), today = days7[6], W = ['일','월','화','수','목','금','토'];
+    const rows = [];
+    vnames.forEach(v => byV[v].forEach(a => { const st = (stats[v] || {})[a.pid] || {}, d = st.days || {};
+      let p = null; try{ p = JSON.parse(((villages[v] || {}).players || {})[a.pid] || 'null'); }catch(e){}
+      rows.push({ a, v, name:(p && p.name) || a.name, total:st.total || 0, today:d[today] || 0, week:days7.reduce((s, k) => s + (d[k] || 0), 0), days:days7.map(k => d[k] || 0), sessions:st.sessions || 0, last:st.last }); }));
+    rows.sort((x, y) => (y[playSort] || 0) - (x[playSort] || 0));
+    const max = Math.max(60, ...rows.map(r => Math.max(...r.days)));
+    const sum = k => rows.reduce((s, r) => s + r[k], 0);
+    const tabs = [['today','오늘'],['week','최근 7일'],['total','전체']].map(([k, l]) => '<button class="small'+(playSort === k ? ' on' : '')+'" data-ps="'+k+'">'+l+' 순</button>').join('');
+    return '<div class="card"><div class="vh"><h2>플레이 시간</h2><span class="cnt">관리자만 볼 수 있어요</span></div>'+
+      '<div class="ptabs">'+tabs+'</div>'+
+      '<div class="psum"><div><b>'+fmt(sum('today'))+'</b><span>오늘 모두 합계</span></div><div><b>'+fmt(sum('week'))+'</b><span>최근 7일 합계</span></div><div><b>'+fmt(sum('total'))+'</b><span>전체 합계</span></div></div>'+
+      rows.map((r, i) => '<div class="prow"><div class="slot" style="background:'+ROOFS[r.a.slot]+'">'+(i+1)+'</div><div class="pwho"><b>'+esc(r.name)+'</b><span>'+esc(r.v)+' 마을 · 접속 '+r.sessions+'회'+(r.last ? ' · 마지막 플레이 '+ago(r.last).replace(' 접속', '') : '')+'</span>'+
+        '<div class="pnum"><span>오늘 <b>'+fmt(r.today)+'</b></span><span>7일 <b>'+fmt(r.week)+'</b></span><span>전체 <b>'+fmt(r.total)+'</b></span></div>'+
+        '<div class="pbars">'+r.days.map((s, k) => { const d = new Date(days7[k]); return '<div title="'+days7[k]+' '+fmt(s)+'"><i style="height:'+Math.max(s ? 3 : 0, Math.round(s / max * 34))+'px"></i><em>'+(k === 6 ? '오늘' : W[d.getDay()])+'</em></div>'; }).join('')+'</div></div></div>').join('')+
+      '<p class="sub" style="margin:10px 0 0;font-size:13px">게임 화면을 켜 두고 5분 안에 한 번이라도 만진 시간만 세요. 화면을 끄거나 다른 앱으로 가면 멈춰요. 이 기록은 게임 안에서는 아무에게도 안 보여요.</p></div>';
   }
   function villageCard(v, list){
     list.sort((a,b) => a.slot - b.slot);

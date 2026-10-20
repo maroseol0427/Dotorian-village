@@ -72,6 +72,17 @@ window.DVNet = (() => {
   api.push = (path, val) => db.ref(api.base + path).push(val).catch(e => console.warn('push', path, e));
   api.signOut = async () => { try{ await db.ref(api.base + 'live/' + api.session.pid).remove(); }catch(e){} await auth.signOut(); location.reload(); };
   api.who = () => api.session ? api.session.email : '';
+  /* play time (only the admin page shows it): stats/{village}/{pid} = { total, days:{date:sec}, sessions, last } */
+  api.addPlay = (sec, day, newSession) => {
+    if (!api.session) return Promise.resolve(false);
+    return db.ref('stats/' + api.session.village + '/' + api.session.pid).transaction(cur => {
+      cur = cur || { total:0, days:{}, sessions:0 }; cur.days = cur.days || {};
+      cur.total = (cur.total || 0) + sec; if (sec) cur.days[day] = (cur.days[day] || 0) + sec;
+      if (newSession) cur.sessions = (cur.sessions || 0) + 1;
+      const keys = Object.keys(cur.days).sort(); while (keys.length > 40) delete cur.days[keys.shift()];
+      cur.last = Date.now(); return cur;
+    }).then(() => true).catch(e => { console.warn('stats', e); return false; });
+  };
 
   /* ---------- live positions (who is online right now) ---------- */
   const liveCbs = [];

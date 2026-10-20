@@ -419,6 +419,17 @@ window.DVNet = (() => {
   api.push = (path, val) => db.ref(api.base + path).push(val).catch(e => console.warn('push', path, e));
   api.signOut = async () => { try{ await db.ref(api.base + 'live/' + api.session.pid).remove(); }catch(e){} await auth.signOut(); location.reload(); };
   api.who = () => api.session ? api.session.email : '';
+  /* play time (only the admin page shows it): stats/{village}/{pid} = { total, days:{date:sec}, sessions, last } */
+  api.addPlay = (sec, day, newSession) => {
+    if (!api.session) return Promise.resolve(false);
+    return db.ref('stats/' + api.session.village + '/' + api.session.pid).transaction(cur => {
+      cur = cur || { total:0, days:{}, sessions:0 }; cur.days = cur.days || {};
+      cur.total = (cur.total || 0) + sec; if (sec) cur.days[day] = (cur.days[day] || 0) + sec;
+      if (newSession) cur.sessions = (cur.sessions || 0) + 1;
+      const keys = Object.keys(cur.days).sort(); while (keys.length > 40) delete cur.days[keys.shift()];
+      cur.last = Date.now(); return cur;
+    }).then(() => true).catch(e => { console.warn('stats', e); return false; });
+  };
 
   /* ---------- live positions (who is online right now) ---------- */
   const liveCbs = [];
@@ -7382,6 +7393,22 @@ Object.assign(DESC, {
 function cloudTick(dt, tsec){ Object.values(chars).forEach(c => { const g = c.model && c.model.userData.cloud; if (!g || !c.g.visible) return; g.position.y = 1.66 + Math.sin(tsec*2.2 + (c.slot || 0))*0.04; g.rotation.y = Math.sin(tsec*0.8)*0.3; }); }
 const _featTick13 = featTick;
 featTick = function(dt, tsec){ _featTick13(dt, tsec); cloudTick(dt, tsec); };
+
+/* ================= v14: 플레이 시간 기록 (관리자 페이지에서만 보임) ================= */
+// counts only while the game is on screen and someone touched it in the last 5 minutes
+let playPend = 0, playLastInput = Date.now(), playFlushAt = Date.now();
+['pointerdown', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, () => { playLastInput = Date.now(); }, true));
+const playDay = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+function playFlush(){ if (!playPend || !NETON() || !window.DVNet.addPlay) return; const n = playPend; playPend = 0; playFlushAt = Date.now(); window.DVNet.addPlay(n, playDay(), false).then(ok => { if (!ok) playPend += n; }); }
+setInterval(() => {
+  if (!NETON() || !G.started || document.hidden) return;
+  if (Date.now() - playLastInput > 5*60*1000) return;
+  playPend++;
+  if (Date.now() - playFlushAt > 60000) playFlush();
+}, 1000);
+document.addEventListener('visibilitychange', () => { if (document.hidden) playFlush(); });
+window.addEventListener('pagehide', playFlush);
+Store.on('loaded', () => { if (NETON() && window.DVNet.addPlay) window.DVNet.addPlay(0, playDay(), true); });
 
 
 $('#roomBtn').addEventListener('click', () => G.panel==='decor' ? closePanel() : openDecorate());
