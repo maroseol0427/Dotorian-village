@@ -629,6 +629,18 @@ const Char3D = (() => {
     if (I.extra) { I.handR.add(I.extra); I.extra.position.set(0, 0, 0.02); I.extra.rotation.set(1.0, 0, 0); }
   }
 
+  const hoodCache = {};
+  function hoodGeo(THREE, R, al) {
+    const k = R.toFixed(4) + '|' + al; if (hoodCache[k]) return hoodCache[k];
+    const src = new THREE.SphereGeometry(R, 56, 36).toNonIndexed(), P = src.attributes.position, N = src.attributes.normal, keepP = [], keepN = [], ca = Math.cos(al - 0.03), cb = Math.cos(Math.PI * 0.82);
+    for (let t = 0; t < P.count; t += 3) {
+      let cx = 0, cy = 0, cz = 0, y0 = 9, y1 = -9; for (let v = 0; v < 3; v++) { const y = P.getY(t + v); cx += P.getX(t + v); cy += y; cz += P.getZ(t + v); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+      const l = Math.hypot(cx, cy, cz) || 1; if (cz / l > ca || (y0 + y1) / 2 / R < cb) continue; // band midpoint keeps whole quads → straight neck edge
+      for (let v = 0; v < 3; v++) { keepP.push(P.getX(t + v), P.getY(t + v), P.getZ(t + v)); keepN.push(N.getX(t + v), N.getY(t + v), N.getZ(t + v)); }
+    }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(keepP, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(keepN, 3));
+    return hoodCache[k] = g;
+  }
   function build(THREE, L) {
     const root = new THREE.Group();
     const add = (geo, mat, x, y, z, parent) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = false; (parent || root).add(m); return m; };
@@ -738,7 +750,7 @@ const Char3D = (() => {
     // hats
     if (H) {
       const c = H.c || '#3c6fd1', hm = toon(THREE, c), hd = toon(THREE, shade(c, 0.85));
-      const dome = (r, th, y, sx = 1.1, sy = 1.0, sz = 1.04, m = hm) => { const d = add(new THREE.SphereGeometry(r, 28, 12, 0, Math.PI * 2, 0, Math.PI * th), m, 0, y, 0, head); d.scale.set(sx, sy, sz); return d; };
+      const dome = (r, th, y, sx = 1.1, sy = 1.0, sz = 1.04, m = hm) => { const mm = m.clone(); mm.side = THREE.DoubleSide; const d = add(new THREE.SphereGeometry(r, 28, 12, 0, Math.PI * 2, 0, Math.PI * th), mm, 0, y, 0, head); d.scale.set(sx, sy, sz); return d; };
       switch (hst) {
         case 'cap': dome(HR * 1.04, 0.44, 0.02); { const v = add(new THREE.CylinderGeometry(0.2, 0.2, 0.025, 20, 1, false, -Math.PI / 2, Math.PI), hd, 0, 0.09, 0.3, head); v.scale.set(1.25, 1, 0.9); } add(new THREE.SphereGeometry(0.03, 8, 6), hm, 0, 0.4, 0, head); break;
         case 'beanie': dome(HR * 1.06, 0.47, 0, 1.1, 1.08); { const r = add(new THREE.TorusGeometry(HR * 1.13, 0.045, 8, 28), hd, 0, 0.04, 0, head); r.rotation.x = Math.PI / 2; r.scale.set(1.04, 0.94, 1); } add(new THREE.SphereGeometry(0.08, 12, 10), toon(THREE, H.c2 || '#ffffff'), 0, 0.45, 0, head); break;
@@ -754,8 +766,11 @@ const Char3D = (() => {
         case 'rainhat': { dome(HR * 1.05, 0.45, 0.02); const b = add(new THREE.CylinderGeometry(0.42, 0.52, 0.06, 26, 1, true), toon(THREE, c, null, { side: THREE.DoubleSide }), 0, 0.12, 0, head); b.scale.set(1.05, 1, 1.1); } break;
         case 'pirate': { const h = add(new THREE.SphereGeometry(0.36, 22, 12, 0, Math.PI * 2, 0, Math.PI * 0.5), hm, 0, 0.12, 0, head); h.scale.set(1.15, 0.9, 1.1); const brim = add(new THREE.TorusGeometry(0.36, 0.07, 6, 3), hm, 0, 0.16, 0, head); brim.rotation.x = Math.PI / 2; brim.scale.set(1.3, 1.1, 0.6); add(new THREE.SphereGeometry(0.05, 8, 6), toon(THREE, '#ffffff'), 0, 0.3, 0.33, head); } break;
         case 'dinohood': case 'bearhood': case 'ghosthood': case 'penguinhood': {
-          const hood = add(new THREE.SphereGeometry(HR * 1.12, 28, 18, Math.PI / 2 + 0.95, Math.PI * 2 - 1.9, 0, Math.PI * 0.82), hm, 0, -0.02, -0.01, head); hood.scale.set(1.1, 1.04, 1.04);
-          const rim = add(new THREE.TorusGeometry(0.3, 0.05, 8, 24), hd, 0, -0.02, 0.27, head); rim.scale.set(1.05, 1.05, 1);
+          // closed hood: a whole shell with one round face opening (rim sits exactly on its edge) and the neck left open underneath
+          const hg2 = new THREE.Group(); hg2.position.set(0, -0.02, -0.01); hg2.scale.set(1.1, 1.04, 1.04); head.add(hg2);
+          const HRh = HR * 1.12, al = 0.78;
+          add(hoodGeo(THREE, HRh, al), toon(THREE, c, null, { side: THREE.DoubleSide }), 0, 0, 0, hg2);
+          add(new THREE.TorusGeometry(HRh * Math.sin(al), 0.055, 10, 40), hd, 0, 0, HRh * Math.cos(al), hg2);
           if (hst === 'bearhood') [-1, 1].forEach(s => { add(new THREE.SphereGeometry(0.1, 12, 10), hm, 0.27 * s, 0.33, -0.02, head).scale.set(1, 1, 0.6); add(new THREE.SphereGeometry(0.055, 10, 8), toon(THREE, H.c2 || '#f2d2b0'), 0.27 * s, 0.33, 0.04, head).scale.set(1, 1, 0.5); });
           else if (hst === 'dinohood') for (let k = 0; k < 5; k++) { const a = -0.3 + k * 0.42; const sp = add(new THREE.ConeGeometry(0.06, 0.13, 6), toon(THREE, H.c2 || '#ffd34e'), 0, 0.42 * Math.cos(a), -0.42 * Math.sin(a), head); sp.rotation.x = -a; }
           if (hst === 'penguinhood') { const bk = add(new THREE.ConeGeometry(0.05, 0.1, 10), toon(THREE, '#ffa53a'), 0, 0.33, 0.33, head); bk.rotation.x = Math.PI / 2 + 0.3; [-1, 1].forEach(s => { add(new THREE.SphereGeometry(0.03, 8, 6), toon(THREE, '#ffffff'), 0.1 * s, 0.4, 0.3, head); add(new THREE.SphereGeometry(0.016, 6, 4), toon(THREE, '#2a2440'), 0.1 * s, 0.405, 0.325, head); }); }
